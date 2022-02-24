@@ -1,6 +1,8 @@
 const express = require("express");
 const mongoose = require("mongoose");
 const session = require("express-session");
+const MongoStore = require("connect-mongo");
+
 const pageRoute = require("./routes/pageRoute");
 const courseRoute = require("./routes/courseRoute");
 const categoryRoute = require("./routes/categoryRoute");
@@ -16,7 +18,7 @@ mongoose.connect("mongodb://localhost:27017/smartedu-db").then(() => {
 app.set("view engine", "ejs");
 
 //global variables
-global.userIN=null;
+global.userIN = null;
 
 //Middlewares definitions
 
@@ -28,14 +30,15 @@ app.use(
     secret: "my_keyboard_cat",
     resave: false,
     saveUninitialized: true,
+    store: MongoStore.create({ mongoUrl: "mongodb://localhost:27017/smartedu-db" }),
   })
 );
 
 //routes
-app.use('*',(req,res,next)=>{
-  userIN=req.session.userID;
+app.use("*", (req, res, next) => {
+  userIN = req.session.userID;
   next();
-})
+});
 app.use("/", pageRoute);
 app.use("/courses", courseRoute);
 app.use("/categories", categoryRoute);
